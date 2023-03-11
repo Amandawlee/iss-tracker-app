@@ -270,7 +270,8 @@ def location(epoch) -> dict:
     if epoch in allEpochs:
         locationData = {}
         epochData = state_vector(epoch)
-    
+        epoch = epochData['EPOCH']
+
         hrs = int(epoch[9:11])
         mins = int(epoch[12:14])
         x = float(epochData['X']['#text'])
@@ -284,11 +285,13 @@ def location(epoch) -> dict:
             locationData['LONGITUDE'] = longitude - 360
         elif (longitude <-180):
             locationData['LONGITUDE'] = longitude + 360
+        else:
+            locationData['LOGNITUDE'] = longitude
 
         altitude = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
         locationData['ALTITUDE'] = { 'value' : altitude, 'units' : "km" }
 
-        geolocation = geocode.reverse((locationData['LATITUDE'],locationData['LONGITUDE']), zoom = 10, language = 'en')
+        geolocation = geocoder.reverse((locationData['LATITUDE'],locationData['LONGITUDE']), zoom = 10, language = 'en')
         if (geolocation == None):
             locationData['GEOPOSITION'] = "Error, the geolocation data is not available because the ISS is over the ocean."
         else:
@@ -308,23 +311,20 @@ def now() -> dict:
         infoNow: Dictionary of location information, closest epoch, and instantaneous speed
     """
 
-    stateVectors = data['ndm']['oem']['body']['segment']['data']['stateVector']
     infoNow = {}
 
     if (data == []):
         return([])
         exit()
 
-    allEpochs = []
-    minDifference = time.time() - time.mktime(time.strptime(data[0]['EPOCH'][:-5], '%Y-%jT%H:%M:%S'))
-    minStateVector = data[0]
+    minDifference = time.time() - time.mktime(time.strptime(data['ndm']['oem']['body']['segment']['data']['stateVector'][0]['EPOCH'][:-5], '%Y-%jT%H:%M:%S'))
+    minStateVector = data['ndm']['oem']['body']['segment']['data']['stateVector'][0]
 
     for d in data['ndm']['oem']['body']['segment']['data']['stateVector']:
-        allEpochs.append(d['EPOCH'])
         epoch = d['EPOCH']
         
         timeNow = time.time()
-        timeEpoch = time.mktime(time.strptime(epoch[:-1], '%Y-%jT%H:%M:%S'))
+        timeEpoch = time.mktime(time.strptime(epoch[:-5], '%Y-%jT%H:%M:%S'))
         difference = timeNow - timeEpoch
 
         if abs(difference) < abs(minDifference):
@@ -335,6 +335,8 @@ def now() -> dict:
     infoNow['time difference (sec)'] = minDifference
     infoNow['location'] = location(minStateVector['EPOCH'])
     infoNow['speed'] = speed(minStateVector['EPOCH'])
+    
+    return(infoNow)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
