@@ -124,8 +124,9 @@ def speed(epoch) -> dict:
         y_dot = float(epochData['Y_DOT']['#text'])
         z_dot = float(epochData['Z_DOT']['#text'])
      
-        speedDict['value'] = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
-        speedDict['units'] = "km/s"
+        speedDict['#text'] = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
+        speedDict['@units'] = "km/s"
+        speedDict['SPEED'] = { speedDict['#text'], speedDict['@units'] }
         return(speedDict)
     else:
         return('Please enter a valid Epoch time stamp.')
@@ -275,9 +276,9 @@ def location(epoch) -> dict:
 
         hrs = int(epoch[9:11])
         mins = int(epoch[12:14])
-        x = float(epochData['X'])
-        y = float(epochData['Y'])
-        z = float(epochData['Z'])
+        x = float(epochData['X']['#text'])
+        y = float(epochData['Y']['#text'])
+        z = float(epochData['Z']['#text'])
         
         locationData['LATITUDE']  = math.degrees(math.atan2(z,math.sqrt(x**2 + y**2)))
         
@@ -290,7 +291,7 @@ def location(epoch) -> dict:
             locationData['LONGITUDE'] = longitude
 
         altitude = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
-        locationData['ALTITUDE'] = { 'value' : altitude, 'units' : "km" }
+        locationData['ALTITUDE'] = { '#text' : altitude, '@units' : "km" }
 
         geolocation = geocoder.reverse((locationData['LATITUDE'],locationData['LONGITUDE']), zoom = 10, language = 'en')
         if (geolocation == None):
