@@ -290,7 +290,7 @@ def location(epoch) -> dict:
         locationData['ALTITUDE'] = { 'value' : altitude, 'units' : "km" }
 
         geolocation = geocode.reverse((locationData['LATITUDE'],locationData['LONGITUDE']), zoom = 10, language = 'en')
-        if geolocation = None:
+        if (geolocation == None):
             locationData['GEOPOSITION'] = "Error, the geolocation data is not available because the ISS is over the ocean.")
         else:
             locationData['GEOPOSITION'] = geoposition.raw['address']
