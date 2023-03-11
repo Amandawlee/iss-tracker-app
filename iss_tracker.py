@@ -291,7 +291,7 @@ def location(epoch) -> dict:
             locationData['LONGITUDE'] = longitude
 
         altitude = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
-        locationData['ALTITUDE'] = { '#text' : altitude, '@units' : "km" }
+        locationData['ALTITUDE'] = { '#value' : altitude, '@units' : "km" }
 
         geoposition = geocoder.reverse((locationData['LATITUDE'],locationData['LONGITUDE']), zoom = 10, language = 'en')
         if (geoposition == None):
