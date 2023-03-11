@@ -126,7 +126,7 @@ def speed(epoch) -> dict:
      
         speed = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
         
-        speedDict = {'SPEED' : {'#test' : speed, '@units' : "km/s"} }
+        speedDict = {'#test' : speed, '@units' : "km/s"}
         return(speedDict)
     else:
         return('Please enter a valid Epoch time stamp.')
@@ -333,10 +333,10 @@ def now() -> dict:
             minDifference = difference
             minStateVector = d
 
-    infoNow['closest_epoch'] = minStateVector['EPOCH']
-    infoNow['time difference (sec)'] = minDifference
-    infoNow['location'] = location(minStateVector['EPOCH'])
-    infoNow['speed'] = speed(minStateVector['EPOCH'])
+    infoNow['CLOSEST EPOCH'] = minStateVector['EPOCH']
+    infoNow['TIME DIFFERENCE'] = minDifference
+    infoNow['LOCATION'] = location(minStateVector['EPOCH'])
+    infoNow['SPEED'] = speed(minStateVector['EPOCH'])
     
     return(infoNow)
 
