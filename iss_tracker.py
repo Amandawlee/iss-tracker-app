@@ -263,13 +263,14 @@ def location(epoch) -> dict:
     """
 
     if (data == []):
-        return([])
+        return({})
         exit()
+
+    locationData = {}
+    epochData = state_vector(epoch)
 
     allEpochs = epochs()
     if epoch in allEpochs:
-        locationData = {}
-        epochData = state_vector(epoch)
         epoch = epochData['EPOCH']
 
         hrs = int(epoch[9:11])
@@ -283,10 +284,10 @@ def location(epoch) -> dict:
         longitude = math.degrees(math.atan2(y,x)) - ((hrs-12)+(mins/60))*(360/24) + 32
         if (longitude > 180):
             locationData['LONGITUDE'] = longitude - 360
-        elif (longitude <-180):
+        elif (longitude < -180):
             locationData['LONGITUDE'] = longitude + 360
         else:
-            locationData['LOGNITUDE'] = longitude
+            locationData['LONGITUDE'] = longitude
 
         altitude = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
         locationData['ALTITUDE'] = { 'value' : altitude, 'units' : "km" }
@@ -295,7 +296,7 @@ def location(epoch) -> dict:
         if (geolocation == None):
             locationData['GEOPOSITION'] = "Error, the geolocation data is not available because the ISS is over the ocean."
         else:
-            locationData['GEOPOSITION'] = geoposition.raw['address']
+            locationData['GEOPOSITION'] = geoposition.raw["address"]
 
         return(locationData)
 
