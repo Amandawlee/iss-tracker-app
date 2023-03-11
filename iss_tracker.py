@@ -124,9 +124,9 @@ def speed(epoch) -> dict:
         y_dot = float(epochData['Y_DOT']['#text'])
         z_dot = float(epochData['Z_DOT']['#text'])
      
-        speedDict['#text'] = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
-        speedDict['@units'] = "km/s"
-        speedDict['SPEED'] = { speedDict['#text'], speedDict['@units'] }
+        speed = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
+        
+        speedDict = {'SPEED' : {'#test' : speed, '@units' : "km/s"} }
         return(speedDict)
     else:
         return('Please enter a valid Epoch time stamp.')
