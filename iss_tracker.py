@@ -334,7 +334,7 @@ def now() -> dict:
             minStateVector = d
 
     infoNow['CLOSEST EPOCH'] = minStateVector['EPOCH']
-    infoNow['TIME DIFFERENCE'] = minDifference
+    infoNow['TIME DIFFERENCE'] = {'#text' : minDifference, '@units' : "s"}
     infoNow['LOCATION'] = location(minStateVector['EPOCH'])
     infoNow['SPEED'] = speed(minStateVector['EPOCH'])
     
