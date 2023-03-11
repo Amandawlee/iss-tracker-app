@@ -250,7 +250,7 @@ def metadata() -> dict:
     metadata = data['ndm']['oem']['body']['segment']['metadata']
     return(metadata)
 
-@app.route('/epochs/<epochs>/location', methods = ['GET'])
+@app.route('/epochs/<epoch>/location', methods = ['GET'])
 def location(epoch) -> dict:
     """
     Calculates the latitude, longitude, altitude, and geoposition using the state vectors function
