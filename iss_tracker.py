@@ -275,9 +275,9 @@ def location(epoch) -> dict:
 
         hrs = int(epoch[9:11])
         mins = int(epoch[12:14])
-        x = float(epochData['X']['#text'])
-        y = float(epochData['Y']['#text'])
-        z = float(epochData['Z']['#text'])
+        x = float(epochData['X'])
+        y = float(epochData['Y'])
+        z = float(epochData['Z'])
         
         locationData['LATITUDE']  = math.degrees(math.atan2(z,math.sqrt(x**2 + y**2)))
         
@@ -330,7 +330,7 @@ def now() -> dict:
 
         if abs(difference) < abs(minDifference):
             minDifference = difference
-            minStateVector = epoch
+            minStateVector = d
 
     infoNow['closest_epoch'] = minStateVector['EPOCH']
     infoNow['time difference (sec)'] = minDifference
