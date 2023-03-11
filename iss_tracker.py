@@ -262,16 +262,15 @@ def location(epoch) -> dict:
         location: Location information at specific epoch time stamp in a dictionary
     """
 
-    locationData = {}
-
     if (data == []):
         return([])
         exit()
 
     allEpochs = epochs()
     if epoch in allEpochs:
+        locationData = {}
         epochData = state_vector(epoch)
-        epoch = state_vector['EPOCH']
+    
         hrs = int(epoch[9:11])
         mins = int(epoch[12:14])
         x = float(epochData['X']['#text'])
