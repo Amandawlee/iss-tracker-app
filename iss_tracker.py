@@ -334,8 +334,8 @@ def now() -> dict:
 
     infoNow['closest_epoch'] = minStateVector['EPOCH']
     infoNow['time difference (sec)'] = minDifference
-    infoNow['location'] = location(minStateVector['EPOCH']
-    infoNow['speed'] = speed(minStateVector['EPOCH']
+    infoNow['location'] = location(minStateVector['EPOCH'])
+    infoNow['speed'] = speed(minStateVector['EPOCH'])
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
