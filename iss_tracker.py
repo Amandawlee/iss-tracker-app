@@ -8,6 +8,7 @@ import time
 
 app = Flask(__name__)
 geocoder = Nominatim(user_agent='iss_tracker')
+MEAN_EARTH_RADIUS = 6371 #km
 
 response = requests.get(url = 'https://nasa-public-data.s3.amazonaws.com/iss-coords/current/ISS_OEM/ISS.OEM_J2K_EPH.xml')
 data = xmltodict.parse(response.text)
@@ -19,6 +20,7 @@ def entire_data_set() -> dict:
     
     Args:
         No arguments
+    
     Returns:
         data: A dictionary of data set
     """
@@ -28,10 +30,12 @@ def entire_data_set() -> dict:
 def epochs() -> list:
     """
     Generates all epochs as a list from the dictionary of the data set
+    
     Args:
         No arguments
+    
     Returns:
-        allEpochs: A list of all epoch time stamps (with corresponding information from the data set
+        allEpochs: A list of all epoch time stamps (with corresponding information from the data set)
     """
 
     if (data == []):
@@ -73,6 +77,7 @@ def epochs() -> list:
 def state_vector(epoch) -> list:
     """
     Displays the state vector for a specific epoch from query parameter
+    
     Args:
         epoch: Specific epoch time stamp from data set (referenced in query line
 
@@ -93,30 +98,35 @@ def state_vector(epoch) -> list:
         stateVector = data['ndm']['oem']['body']['segment']['data']['stateVector'][specific]
         return(stateVector)
     else:
-        return('Please enter a valid Epoch time stamp.')
+        return('Please enter a valid Epoch time stamp.\n')
 
 @app.route('/epochs/<epoch>/speed', methods = ['GET'])
-def speed(epoch) -> float:
+def speed(epoch) -> dict:
     """
     Reads the list of epochs and calculates the instantaneous speed from a specific epoch time stamp from the state vector
+    
     Args:
-        epoch: Specific epoch time stamp from data set (referenced in query line
+        epoch: Specific epoch time stamp from data set (referenced in query line)
+    
     Returns: 
-        speed: The instantaneous speed calculated from the state vector
+        speedDict: The instantaneous speed calculated from the state vector in a dictionary
     """
 
     if (data == []):
         return([])
         exit()
 
+    speedDict = {}
     allEpochs = epochs()
     if epoch in allEpochs:
         epochData = state_vector(epoch)
         x_dot = float(epochData['X_DOT']['#text'])
         y_dot = float(epochData['Y_DOT']['#text'])
         z_dot = float(epochData['Z_DOT']['#text'])
-        speed = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
-        return(str(speed) + '\n')
+     
+        speedDict['value'] = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
+        speedDict['units'] = "km/s"
+        return(speedDict)
     else:
         return('Please enter a valid Epoch time stamp.')
 
@@ -127,6 +137,7 @@ def help() -> str:
     
     Args:
         No arguments
+    
     Returns:
         helpText: Returns help text as a guide for all routes
     """
@@ -148,8 +159,10 @@ $ curl http://127.0.0.1:5000... \n\
 def delete_data() -> str:
     """
     Deletes the data set from the .json file that was being used
+    
     Args:
         No arguments
+    
     Returns:
         deleted_data_statement: A statement (str) indicating that the  data set has been deleted
     """
@@ -163,8 +176,10 @@ def delete_data() -> str:
 def post_data() -> str:
     """
     Reloads the data set from ISS Trajectory website and adds it to a .json file
+    
     Args:
         No arguments
+    
     Returns:
         reloaded_data_statement: A statement (str) indicating that the data set has been reloaded
     """
@@ -175,6 +190,152 @@ def post_data() -> str:
     reloaded_data_statement = "NASA ISS Trajectory data set has been reloaded.\n"
     return(reloaded_data_statement)
 
+@app.route('/comment', methods = ['GET'])
+def comment_list() -> list:
+    """
+    Returns the list of comments in the ISS trajectory data set
+
+    Args:
+        No arguments
+
+    Returns:
+        commentList: List object of comments from ISS trajectory data set
+    """
+    
+    if (data == []):
+        return([])
+        exit()
+
+    commentList = []
+    for d in data['ndm']['oem']['body']['segment']['data']['COMMENT']:
+        commentList.append(d)
+
+    return(commentList)
+
+@app.route('/header', methods = ['GET'])
+def header_dict() -> dict:
+    """
+    Returns the dictionary for the header in the ISS trajectory data set
+
+    Args:
+        No arguments
+
+    Returns:
+        headerDict: Dictionary object of header from ISS trajectory data set
+    """
+
+    if (data == []):
+        return([])
+        exit()
+
+    headerDict = data['ndm']['oem']['header']
+    return(headerDict)
+
+@app.route('/metadata', methods = ['GET'])
+def metadata() -> dict:
+    """
+    Returns the dictionary of metadata in the ISS trajectory data set
+
+    Args:
+        No arguments
+
+    Returns:
+        metadata: Dictionary object of metadata from ISS trajectory dats set
+    """
+
+    if (data == []):
+        return([])
+        exit()
+
+    metadata = data['ndm']['oem']['body']['segment']['metadata']
+    return(metadata)
+
+@app.route('/epochs/<epochs>/location', methods = ['GET'])
+def location(epoch) -> dict:
+    """
+    Calculates the latitude, longitude, altitude, and geoposition using the state vectors function
+    
+    Args:
+        epoch: Specific epoch time stamp from data set (referenced in query line)
+
+    Returns:
+        location: Location information at specific epoch time stamp in a dictionary
+    """
+
+    locationData = {}
+
+    if (data == []):
+        return([])
+        exit()
+
+    allEpochs = epochs()
+    if epoch in allEpochs:
+        epochData = state_vector(epoch)
+        epoch = state_vector['EPOCH']
+        hrs = int(epoch[9:11])
+        mins = int(epoch[12:14])
+        x = float(epochData['X']['#text'])
+        y = float(epochData['Y']['#text'])
+        z = float(epochData['Z']['#text'])
+        
+        locationData['LATITUDE']  = math.degrees(math.atan2(z,math.sqrt(x**2 + y**2)))
+        
+        longitude = math.degrees(math.atan2(y,x)) - ((hrs-12)+(mins/60))*(360/24) + 32
+        if (longitude > 180):
+            longitude = longitude - 360
+        elif (longitude <-180):
+            longitude = longitude + 360
+
+        altitude = math.sqrt(x**2 + y**2 + z**2) - MEAN_EARTH_RADIUS
+        locationData['ALTITUDE'] = { 'value' : altitude, 'units' : "km" }
+
+        geolocation = geocode.reverse(latitude,longitude), zoom = 10, language = 'en')
+        if geolocation = None:
+            locationData['GEOPOSITION'] = "Error, the geolocation data is not available because the ISS is over the ocean.")
+        else:
+            locationData['GEOPOSITION'] = geoposition.raw['address']
+
+        return(locationData)
+
+@app.route('/now', methods = ['GET'])
+def now() -> dict:
+    """
+    Returns a dictionary of the latitude, longitude, altitude, and geopositon for the Epoch nearest in time
+
+    Args:
+        No arguments
+
+    Returns:
+        infoNow: Dictionary of location information, closest epoch, and instantaneous speed
+    """
+
+    stateVectors = data['ndm']['oem']['body']['segment']['data']['stateVector']
+    infoNow = {}
+
+    if (data == []):
+        return([])
+        exit()
+
+    allEpochs = []
+    minDifference = time.time() - time.mktime(time.strptime(data[0]['EPOCH'][:-5], '%Y-%jT%H:%M:%S'))
+    minStateVector = data[0]
+
+    for d in data['ndm']['oem']['body']['segment']['data']['stateVector']:
+        allEpochs.append(d['EPOCH'])
+        epoch = d['EPOCH']
+        
+        timeNow = time.time()
+        timeEpoch = time.mktime(time.strptime(epoch[:-1], '%Y-%jT%H:%M:%S'))
+        difference = timeNow - timeEpoch
+
+        if abs(difference) < abs(minDifference):
+            minDifference = difference
+            minStateVector = epoch
+
+    infoNow['closest_epoch'] = minStateVector['EPOCH']
+    infoNow['time difference (sec)'] = minDifference
+    infoNow['location'] = location(minStateVector['EPOCH']
+    infoNow['speed'] = speed(minStateVector['EPOCH']
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
