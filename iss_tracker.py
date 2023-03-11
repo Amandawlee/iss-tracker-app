@@ -126,7 +126,7 @@ def speed(epoch) -> dict:
      
         speed = math.sqrt(x_dot**2 + y_dot**2 + z_dot**2)
         
-        speedDict = {'#text' : speed, '@units' : "km/s"}
+        speedDict = {'#value' : speed, '@units' : "km/s"}
         return(speedDict)
     else:
         return('Please enter a valid Epoch time stamp.')
@@ -297,7 +297,7 @@ def location(epoch) -> dict:
         if (geoposition == None):
             locationData['GEOPOSITION'] = "Error, the geolocation data is not available because the ISS is over the ocean."
         else:
-            locationData['GEOPOSITION'] = geoposition.raw
+            locationData['GEOPOSITION'] = geoposition.raw['address']
 
         return(locationData)
 
@@ -334,7 +334,7 @@ def now() -> dict:
             minStateVector = d
 
     infoNow['CLOSEST_EPOCH'] = minStateVector['EPOCH']
-    infoNow['TIME_DIFFERENCE'] = {'#text' : minDifference, '@units' : "s"}
+    infoNow['SECONDS_FROM_NOW'] = {'#value' : minDifference, '@units' : "s"}
     infoNow['LOCATION'] = location(minStateVector['EPOCH'])
     infoNow['SPEED'] = speed(minStateVector['EPOCH'])
     
