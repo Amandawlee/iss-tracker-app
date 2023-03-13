@@ -1,6 +1,6 @@
-# Containerizing and Making Improvements to the ISS Trajectory Data API
+# ISS Trajectory Data API
 
-The homework05 directory consists of three files: <code>iss_tracker.py</code>, <code>README.md</code>, and <code>Dockerfile</code>.
+The iss_tracker_app directory consists of four files: <code>iss_tracker.py</code>, <code>README.md</code>, <code>Dockerfile</code>, and <code>docker-compose.yml</code>.
 
 The <code>iss_tracker.py</code> file queries and returns information from an International Space Station (ISS) data set that consists of interesting positional and velocity data. The data set contains ISS state vectors over an approximate 15-day period with Cartesian vectors for both position and velocity as well as a time stamp (EPOCH). The frame of reference for these vectors is Earth, based on the J2000 reference frame.
 
@@ -10,17 +10,21 @@ The Flask application loads in the data from a link, https://spotthestation.nasa
 
 First Method:
 
-Use <code>git clone git@github.com:Amandawlee/my-coe332-hws.git</code> to clone the repository to your local system. Then, locate the file through <code>cd my-coe332-hws/homework05</code>. In order to run the code, run the Flask application through one ssh terminal and then query it through another ssh terminal.
+Use <code>git clone git@github.com:Amandawlee/iss-tracker-app.git</code> to clone the repository to your local system. Then, locate the file through <code>cd iss-tracker-app</code>. In order to run the code, run the Flask application through one ssh terminal and then query it through another ssh terminal.
 
 To run the Flask application, insert the following on the command line: <code>flask --app iss_tracker --debug run</code>.
 
 Second Method:
 
-Use <code>git clone git@github.com:Amandawlee/my-coe332-hws.git</code> to clone the repository to your local system. Then, locate the file through <code>cd my-coe332-hws/homework05</code>. Build a Docker image locally from the Dockerfile with <code>docker build -t username/iss_tracker:hw05 .</code>. Then, run the image as a container with <code>docker run -it --rm -p 5000:5000 username/iss_tracker:hw05</code>. Replace <code>username</code> with your username for Docker Hub.
+Use <code>git clone git@github.com:Amandawlee/iss-tracker-app.git</code> to clone the repository to your local system. Then, locate the file through <code>cd iss-tracker-app</code>. Build a Docker image locally from the Dockerfile with <code>docker build -t username/iss_tracker:midterm .</code>. Then, run the image as a container with <code>docker run -it --rm -p 5000:5000 username/iss_tracker:midterm</code>. Replace <code>username</code> with your username for Docker Hub.
 
 Third Method:
 
-Pull a prebuilt image on Docker Hub with <code>docker pull amandawlee/iss_tracker:hw05</code>  and run it using <code>docker run -it --rm -p 5000:5000 amandawlee/iss_tracker:hw05</code>.
+Pull a prebuilt image on Docker Hub with <code>docker pull amandawlee/iss_tracker:midterm</code>  and run it using <code>docker run -it --rm -p 5000:5000 amandawlee/iss_tracker:midterm</code>.
+
+Fourth Method:
+
+Use <code>git clone git@github.com:Amandawlee/iss-tracker-app.git</code> to clone the repository to your local system. Then, locate the file through <code>cd iss-tracker-app</code>. Run <code>docker-compose up</code> to start up the application with the settings in the <code>docker-compose.yml</code> file.
 
 ## Example Output:
 
@@ -213,4 +217,130 @@ Running <code>curl -X POST http://127.0.0.1:5000/post-data</code>:
 ```
 [vm] $ curl -X POST http://127.0.0.1:5000/post-data
 NASA ISS Trajectory data set has been reloaded.
+```
+
+Running <code>curl http://127.0.0.1:5000/comment</code>:
+
+```
+[vm] $ curl http://127.0.0.1:5000/comment
+[
+  "Units are in kg and m^2",
+  "MASS=473291.00",
+  "DRAG_AREA=1382.32",
+  "DRAG_COEFF=3.30",
+  "SOLAR_RAD_AREA=0.00",
+  "SOLAR_RAD_COEFF=0.00",
+  "Orbits start at the ascending node epoch",
+  "ISS first asc. node: EPOCH = 2023-03-10T12:49:52.131 $ ORBIT = 2648 $ LAN(DEG) = 96.82205",
+  "ISS last asc. node : EPOCH = 2023-03-25T11:56:28.177 $ ORBIT = 2880 $ LAN(DEG) = 21.35242",
+  "Begin sequence of events",
+  "TRAJECTORY EVENT SUMMARY:",
+  null,
+  "|       EVENT        |       TIG        | ORB |   DV    |   HA    |   HP    |",
+  "|                    |       GMT        |     |   M/S   |   KM    |   KM    |",
+  "|                    |                  |     |  (F/S)  |  (NM)   |  (NM)   |",
+  "=============================================================================",
+  "Crew05 Undock         070:07:00:00.000             0.0     428.4     409.5",
+  "(0.0)   (231.3)   (221.1)",
+  null,
+  "SpX27 Launch          074:00:30:41.000             0.0     428.2     408.5",
+  "(0.0)   (231.2)   (220.6)",
+  null,
+  "SpX27 Docking         075:11:52:14.000             0.0     428.0     408.4",
+  "(0.0)   (231.1)   (220.5)",
+  null,
+  "=============================================================================",
+  "End sequence of events"
+]
+```
+
+Running <code>curl http://127.0.0.1:5000/header</code>:
+
+```
+[vm] $ curl http://127.0.0.1:5000/header
+{
+  "CREATION_DATE": "2023-069T20:06:16.412Z",
+  "ORIGINATOR": "JSC"
+}
+```
+
+Running <code>curl http://127.0.0.1:5000/metadata</code>:
+
+```
+[vm] $ curl http://127.0.0.1:5000/header
+{
+  "CENTER_NAME": "EARTH",
+  "OBJECT_ID": "1998-067-A",
+  "OBJECT_NAME": "ISS",
+  "REF_FRAME": "EME2000",
+  "START_TIME": "2023-069T12:00:00.000Z",
+  "STOP_TIME": "2023-084T12:00:00.000Z",
+  "TIME_SYSTEM": "UTC"
+}
+```
+
+When geoposition is not available:
+
+Running <code>curl http://127.0.0.1:5000/epochs/2023-084T12:00:00.000Z/location</code>:
+
+```
+[vm] $ curl http://127.0.0.1:5000/epochs/2023-084T12:00:00.000Z/location
+{
+  "ALTITUDE": {
+    "#value": 424.8724208912745,
+    "@units": "km"
+  },
+  "GEOPOSITION": "Error, the geolocation data is not available because the ISS is over the ocean.",
+  "LATITUDE": 10.578109735651823,
+  "LONGITUDE": 63.43564678106858
+}
+```
+
+When geoposition is available:
+
+Running <code>curl http://127.0.0.1:5000/epochs/2023-070T10:24:00.000Z/location</code>:
+
+```
+[vm] $ curl http://127.0.0.1:5000/epochs/2023-070T10:24:00.000Z/location
+{
+  "ALTITUDE": {
+    "#value": 429.57808978728553,
+    "@units": "km"
+  },
+  "GEOPOSITION": {
+    "ISO3166-2-lvl4": "AU-NT",
+    "country": "Australia",
+    "country_code": "au",
+    "county": "Barkly Region",
+    "territory": "Northern Territory"
+  },
+  "LATITUDE": -19.139139371943745,
+  "LONGITUDE": 132.60406799656488
+}
+```
+
+Running <code>curl http://127.0.0.1:5000/now</code>:
+
+```
+[vm] $ curl http://127.0.0.1:5000/now
+{
+  "CLOSEST_EPOCH": "2023-072T02:48:00.000Z",
+  "LOCATION": {
+    "ALTITUDE": {
+      "#value": 424.5689709456774,
+      "@units": "km"
+    },
+    "GEOPOSITION": "Error, the geolocation data is not available because the ISS is over the ocean.",
+    "LATITUDE": 7.582165665533791,
+    "LONGITUDE": -99.81000614452068
+  },
+  "SECONDS_FROM_NOW": {
+    "#value": 11.669614553451538,
+    "@units": "s"
+  },
+  "SPEED": {
+    "#value": 7.663007211773518,
+    "@units": "km/s"
+  }
+}
 ```
