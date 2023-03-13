@@ -152,7 +152,12 @@ $ curl http://127.0.0.1:5000... \n\
 \t/epochs/<epoch>/speed              Returns instantaneous speed for a specific Epoch in the data set\n\
 \t/help                              Returns help text that briefly describes each route\n\
 \t/delete-data                       Deletes all data from the dictionary object\n\
-\t/post-data                         Reloads the dictionary object with data from the web\n"
+\t/post-data                         Reloads the dictionary object with data from the web\n\
+\t/comment                           Returns 'comment' list object from ISS data\n\
+\t/header                            Returns 'header dictionary object from ISS data\n\
+\t/metadata                          Returns 'metadata' dictionary object from ISS data\n\
+\t/epochs/<epoch>/location           Returns latitude, longitude, altitude, and geoposition for given Epoch\n\
+\t/now                               Returns latitude, longitude, altitude, and geoposition for Epoch that is nearest in time\n"
 
     return(helpText)
 
@@ -260,7 +265,7 @@ def location(epoch) -> dict:
         epoch: Specific epoch time stamp from data set (referenced in query line)
 
     Returns:
-        location: Location information at specific epoch time stamp in a dictionary
+        locationData: Location information at specific epoch time stamp in a dictionary
     """
 
     if (data == []):
