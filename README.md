@@ -319,7 +319,7 @@ Running <code>curl http://127.0.0.1:5000/epochs/2023-070T10:24:00.000Z/location<
 }
 ```
 
-<code>/now</code> returns the Epoch nearest in time and its respective information. Running <code>curl http://127.0.0.1:5000/now</code>:
+<code>/now</code> returns the epoch time stamp nearest in time and its respective information. Running <code>curl http://127.0.0.1:5000/now</code>:
 
 ```
 [vm] $ curl http://127.0.0.1:5000/now
@@ -345,4 +345,4 @@ Running <code>curl http://127.0.0.1:5000/epochs/2023-070T10:24:00.000Z/location<
 }
 ```
 
-Reminder: Any output regarding epochs will be different depending in the Epoch time used, especially the <code>/now</code> query which outputs the most current Epoch.
+Reminder: Any output regarding epochs will be different depending on the epoch time used, especially the <code>/now</code> query which outputs the most current epoch's information.
